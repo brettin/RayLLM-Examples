@@ -1,0 +1,21 @@
+## From the RayLLM instructions:
+
+cache_dir=${XDG_CACHE_HOME:-~/.cache}
+
+docker run -it --gpus all --shm-size 1g -p 8000:8000 -e HF_HOME=~/data -v $cache_dir:~/data anyscale/ray-llm:latest bash
+
+# Inside docker container
+serve run ~/serve_configs/amazon--LightGPT.yaml
+
+## Tom's translation
+singularity shell --nv \
+	--net --network-args "portmap=8000:8000/tcp" \
+	--env HF_HOME=/rbscratch/brettin/RayLLM/.cache \
+	--bind $cache_dir:~/data \
+	Test 
+
+# the mount should make use of already stored .cache
+# so we mount /rbscratch/brettin/RayLLM/ 
+	--bind /rbscratch/brettin/RayLLM:/home/brettin
+
+singularity shell --nv --bind /rbscratch/brettin/RayLLM/.cache:/home/brettin/data --env HF_HOME=/rbscratch/brettin/RayLLM/.cache Test
